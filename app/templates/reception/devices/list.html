@@ -1,3 +1,4 @@
+{% from 'components/icons.html' import icon, brand %}
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -6,27 +7,20 @@
     <title>Dispositivos dos quartos | HospitalitySync</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/devices.css') }}">
-    <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+    <script src="{{ url_for('static', path='/js/base.js') }}" defer></script>
+<script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
     <script src="{{ url_for('static', path='/js/devices.js') }}" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', path='/css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/product.css') }}">
+
 </head>
 <body>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
 <div class="app-shell">
-    <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
-        <div class="brand"><div class="brand-mark" aria-hidden="true">H</div><div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div></div>
-        <nav class="navigation">
-            <p class="navigation-label">Operação</p>
-            <a class="navigation-link" href="/reception">Dashboard</a>
-            <a class="navigation-link" href="/reception/reservations">Reservas</a>
-            <a class="navigation-link" href="/reception/guests">Hóspedes</a>
-            <a class="navigation-link is-active" href="/reception/room-devices" aria-current="page">Dispositivos</a>
-            <a class="navigation-link" href="/reception/check-in">Check-in</a>
-            <a class="navigation-link" href="/reception/check-out">Check-out</a>
-        </nav>
-        <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
-    </aside>
-    <main class="main-content">
+    {% include 'components/reception-sidebar.html' %}
+    <main id="main" class="main-content">
         <header class="topbar">
-            <div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button><div><p class="eyebrow">Recepção</p><h1>Dispositivos dos quartos</h1></div></div>
+            <div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Alternar navegação" aria-controls="sidebar" aria-expanded="true">☰</button><div><p class="eyebrow">Recepção</p><h1>Dispositivos dos quartos</h1></div></div>
             <div class="user-area"><div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div><div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><button class="logout-button" id="logout-button" type="button">Sair</button></div>
         </header>
         <div class="device-content">

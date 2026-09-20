@@ -5,7 +5,10 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.exception_handlers import http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy import Engine
 from starlette.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -27,6 +30,7 @@ from app.routers.reception_service_requests import (
 
 
 STATIC_DIRECTORY = Path(__file__).resolve().parent / "static"
+templates = Jinja2Templates(directory=str(STATIC_DIRECTORY.parent / "templates"))
 
 
 def create_app(
@@ -50,6 +54,25 @@ def create_app(
     app = FastAPI(title="HospitalitySync", lifespan=lifespan)
     app.state.settings = application_settings
     app.state.session_factory = session_factory
+
+    @app.exception_handler(StarletteHTTPException)
+    async def browser_access_error(request: Request, error: StarletteHTTPException):
+        # Preserve API status/contracts; only browser HTML requests get a visual page.
+        area = request.url.path.split("/")[1]
+        if (
+            error.status_code in {401, 403}
+            and "text/html" in request.headers.get("accept", "")
+            and area in {"reception", "guest", "kitchen"}
+        ):
+            return templates.TemplateResponse(
+                request=request,
+                name="access-required.html",
+                context={"area": area},
+                status_code=error.status_code,
+                headers=error.headers,
+            )
+        return await http_exception_handler(request, error)
+
     app.add_middleware(
         SessionMiddleware,
         secret_key=application_settings.session_secret_key,
@@ -75,17 +98,34 @@ def create_app(
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "same-origin")
+        if request.url.path.startswith("/docs") or request.url.path == "/redoc":
+            content_security_policy = (
+                "default-src 'self'; "
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+                "img-src 'self' data: https://fastapi.tiangolo.com; "
+                "connect-src 'self'; frame-ancestors 'none'"
+            )
+        else:
+            content_security_policy = (
+                "default-src 'self'; script-src 'self'; style-src 'self'; "
+                "img-src 'self' data:; connect-src 'self' ws: wss:; "
+                "frame-ancestors 'none'"
+            )
         response.headers.setdefault(
             "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self'; "
-            "img-src 'self' data:; connect-src 'self' ws: wss:; "
-            "frame-ancestors 'none'",
+            content_security_policy,
         )
         if application_settings.session_cookie_secure:
             response.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
             )
         return response
+
+    @app.get("/", include_in_schema=False)
+    def root(request: Request) -> HTMLResponse:
+        return templates.TemplateResponse(request=request, name="landing.html", context={})
+
     app.mount("/static", StaticFiles(directory=str(STATIC_DIRECTORY)), name="static")
     app.include_router(auth_router)
     app.include_router(reception_router)

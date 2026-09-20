@@ -1,42 +1,31 @@
-const logoutButton = document.querySelector("#logout-button");
-const sidebar = document.querySelector("#sidebar");
-const menuToggle = document.querySelector("#menu-toggle");
-const toast = document.querySelector("#toast");
-
-function showMessage(message) {
-    toast.textContent = message;
-    toast.classList.add("is-visible");
-    window.setTimeout(() => toast.classList.remove("is-visible"), 2600);
+"use strict";
+function showMessage(message) { Hospitality.toast(message); }
+document.querySelector('#logout-button')?.addEventListener('click', async event => {
+    if (await Hospitality.mutate('/auth/logout', undefined, event.currentTarget)) location.replace('/reception/login');
+});
+const sidebar = document.querySelector('#sidebar');
+const menuToggle = document.querySelector('#menu-toggle');
+const shell = document.querySelector('.app-shell');
+const mobileNavigation = window.matchMedia('(max-width: 820px)');
+function syncNavigation() {
+    const expanded = mobileNavigation.matches ? sidebar.classList.contains('is-open') : !shell.classList.contains('is-collapsed');
+    menuToggle?.setAttribute('aria-expanded', String(expanded));
+    sidebar.inert = !expanded;
 }
-
-logoutButton?.addEventListener("click", async () => {
-    logoutButton.disabled = true;
-    logoutButton.textContent = "Saindo…";
-
-    try {
-        const response = await fetch("/auth/logout", {
-            method: "POST",
-            credentials: "same-origin",
-        });
-
-        if (!response.ok) {
-            throw new Error("Logout request failed");
-        }
-        window.location.replace("/reception");
-    } catch {
-        logoutButton.disabled = false;
-        logoutButton.textContent = "Sair";
-        showMessage("Não foi possível encerrar a sessão.");
+menuToggle?.addEventListener('click', () => {
+    if (mobileNavigation.matches) sidebar.classList.toggle('is-open');
+    else shell.classList.toggle('is-collapsed');
+    syncNavigation();
+});
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && mobileNavigation.matches) {
+        sidebar.classList.remove('is-open'); syncNavigation(); menuToggle?.focus();
     }
 });
-
-menuToggle?.addEventListener("click", () => {
-    const isOpen = sidebar.classList.toggle("is-open");
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
+document.addEventListener('click', event => {
+    if (mobileNavigation.matches && sidebar.classList.contains('is-open') && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+        sidebar.classList.remove('is-open'); syncNavigation();
+    }
 });
-
-document.querySelectorAll(".upcoming-module").forEach((button) => {
-    button.addEventListener("click", () => {
-        showMessage("Este módulo será disponibilizado em uma próxima etapa.");
-    });
-});
+mobileNavigation.addEventListener('change', syncNavigation);
+syncNavigation();

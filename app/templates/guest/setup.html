@@ -1,3 +1,4 @@
+{% from 'components/icons.html' import icon, brand %}
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -5,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configurar dispositivo | HospitalitySync</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/css/guest.css') }}">
-    <script src="{{ url_for('static', path='/js/guest.js') }}" defer></script>
+    <script src="{{ url_for('static', path='/js/base.js') }}" defer></script>
+<script src="{{ url_for('static', path='/js/guest.js') }}" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', path='/css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/product.css') }}">
+
 </head>
 <body class="guest-setup-page">
-    <main class="setup-card">
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
+    <main id="main" class="setup-card">
         <div class="guest-brand"><span>H</span><strong>HospitalitySync</strong></div>
         <p class="guest-eyebrow">Configuração segura</p>
         <h1>Vincular este dispositivo</h1>

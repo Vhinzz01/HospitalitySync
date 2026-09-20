@@ -157,3 +157,19 @@ def test_guest_receives_order_status_only_for_its_room(food_context: dict[str, o
         assert response.status_code==200
         event=websocket.receive_json()
     assert event=={"type":"food_order.updated","id":order["id"],"status":"PREPARING"}
+
+
+def test_order_is_rendered_in_kitchen_and_guest_templates(food_context):
+    order = create_order(food_context)
+    kitchen = kitchen_client(food_context).get("/kitchen")
+    assert kitchen.status_code == 200
+    assert f'data-order-id="{order["id"]}"' in kitchen.text
+    assert 'data-next-status="PREPARING"' in kitchen.text
+    guest = device_client(food_context).get("/guest/food")
+    assert guest.status_code == 200
+    assert f'Pedido #{order["id"]}' in guest.text
+    assert 'class="order-progress"' in guest.text
+    # A second room must not see the first room's order in the rendered page.
+    other_room = device_client(food_context, "other_credential").get("/guest/food")
+    assert other_room.status_code == 200
+    assert f'Pedido #{order["id"]}' not in other_room.text

@@ -42,6 +42,69 @@ def test_security_headers_are_applied(security_context: dict[str, object]) -> No
     assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
 
 
+def test_root_serves_landing_page(
+    security_context: dict[str, object],
+) -> None:
+    client=security_context["client"]; assert isinstance(client,TestClient)
+    response=client.get("/",follow_redirects=False)
+    assert response.status_code==200
+    assert 'href="/reception/login"' in response.text
+    assert 'href="/kitchen/login"' in response.text
+    assert 'href="/guest"' in response.text
+    assert "A arte de receber." in response.text
+    assert "'unsafe-inline'" not in response.headers["content-security-policy"]
+
+
+def test_reception_login_uses_existing_authentication(security_context):
+    client = security_context["client"]
+    page = client.get("/reception/login")
+    assert page.status_code == 200
+    assert 'data-endpoint="/auth/login"' in page.text
+    assert 'data-destination="/reception"' in page.text
+    assert client.get("/reception").status_code == 401
+    assert client.post("/auth/login", json=security_context["reception"]).status_code == 200
+    assert client.get("/reception").status_code == 200
+    assert client.post("/auth/logout").status_code == 204
+    assert client.get("/reception").status_code == 401
+
+
+def test_kitchen_login_uses_existing_authentication(security_context):
+    client = security_context["client"]
+    page = client.get("/kitchen/login")
+    assert page.status_code == 200
+    assert 'data-endpoint="/auth/kitchen/login"' in page.text
+    assert client.post("/auth/kitchen/login", json=security_context["kitchen"]).status_code == 200
+    page = client.get("/kitchen")
+    assert page.status_code == 200
+    assert page.text.count('class="order-column"') == 4
+
+
+def test_api_documentation_csp_allows_swagger_assets(
+    security_context: dict[str, object],
+) -> None:
+    client=security_context["client"]; assert isinstance(client,TestClient)
+    response=client.get("/docs")
+    policy=response.headers["content-security-policy"]
+    assert response.status_code==200
+    assert "https://cdn.jsdelivr.net" in policy
+    assert "'unsafe-inline'" in policy
+
+
+@pytest.mark.parametrize("path,link", [
+    ("/reception", "/reception/login"),
+    ("/kitchen", "/kitchen/login"),
+    ("/guest", "/guest/setup"),
+])
+def test_html_access_error_preserves_authorization(security_context, path, link):
+    client = security_context["client"]
+    response = client.get(path, headers={"Accept": "text/html"})
+    assert response.status_code == 401
+    assert f'href="{link}"' in response.text
+    api_response = client.get(path, headers={"Accept": "application/json"})
+    assert api_response.status_code == 401
+    assert "detail" in api_response.json()
+
+
 def test_cross_origin_state_change_is_blocked(security_context: dict[str, object]) -> None:
     client=security_context["client"]; assert isinstance(client,TestClient)
     response=client.post("/auth/login",json=security_context["reception"],headers={"Origin":"https://attacker.example"})

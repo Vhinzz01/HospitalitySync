@@ -1,3 +1,4 @@
+{% from 'components/icons.html' import icon, brand %}
 <!doctype html>
 <html lang="pt-BR">
     <head>
@@ -6,52 +7,22 @@
         <meta name="description" content="Dashboard operacional da recepção do HospitalitySync">
         <title>Recepção | HospitalitySync</title>
         <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
-        <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+        <script src="{{ url_for('static', path='/js/base.js') }}" defer></script>
+<script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
         <script src="{{ url_for('static', path='/js/reception-dashboard.js') }}" defer></script>
-    </head>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', path='/css/product.css') }}">
+
+</head>
     <body>
+<a class="skip-link" href="#main">Pular para o conteúdo</a>
         <div class="app-shell">
-            <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
-                <div class="brand">
-                    <div class="brand-mark" aria-hidden="true">H</div>
-                    <div>
-                        <strong>HospitalitySync</strong>
-                        <span>Gestão hoteleira</span>
-                    </div>
-                </div>
+            {% include 'components/reception-sidebar.html' %}
 
-                <nav class="navigation">
-                    <p class="navigation-label">Operação</p>
-                    <a class="navigation-link is-active" href="/reception" aria-current="page">
-                        <span class="navigation-icon" aria-hidden="true">⌂</span>
-                        Dashboard
-                    </a>
-                    <a class="navigation-link" href="/reception/reservations">
-                        <span class="navigation-icon" aria-hidden="true">•</span>
-                        Reservas
-                    </a>
-                    <a class="navigation-link" href="/reception/guests">
-                        <span class="navigation-icon" aria-hidden="true">•</span>
-                        Hóspedes
-                    </a>
-                    <a class="navigation-link" href="/reception/room-devices"><span class="navigation-icon" aria-hidden="true">•</span>Dispositivos</a>
-                    <a class="navigation-link" href="/reception/check-in"><span class="navigation-icon" aria-hidden="true">•</span>Check-in</a>
-                    <a class="navigation-link" href="/reception/check-out"><span class="navigation-icon" aria-hidden="true">•</span>Check-out</a>
-
-                    <p class="navigation-label navigation-label-secondary">Serviços</p>
-                    <a class="navigation-link" href="/reception/service-requests"><span class="navigation-icon" aria-hidden="true">•</span>Solicitações</a>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <span class="system-indicator" aria-hidden="true"></span>
-                    Sistema operacional
-                </div>
-            </aside>
-
-            <main class="main-content">
+            <main id="main" class="main-content">
                 <header class="topbar">
                     <div class="topbar-heading">
-                        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button>
+                        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Alternar navegação" aria-controls="sidebar" aria-expanded="true">☰</button>
                         <div>
                             <p class="eyebrow">Recepção</p>
                             <h1>Visão geral</h1>
@@ -68,17 +39,17 @@
                     </div>
                 </header>
 
-                <div class="dashboard-content">
+                <div class="dashboard-content"><div class="dashboard-toolbar"><span class="connection-status" data-connection role="status">Conectando…</span><button type="button" data-refresh>Atualizar dados</button><a href="/reception/service-requests">Notificações de serviços ↗</a></div>
                     <section class="welcome-row" aria-labelledby="dashboard-title">
                         <div>
                             <p class="eyebrow">Operação de hoje</p>
-                            <h2 id="dashboard-title">Dashboard da recepção</h2>
-                            <p>Acompanhe a ocupação, movimentações previstas e reservas recentes.</p>
+                            <h2 id="dashboard-title">Seu hotel, em sintonia.</h2>
+                            <p>Cada chegada, cada cuidado. Sua operação em um só lugar.</p>
                         </div>
                         <time>{{ dashboard.date_label }}</time>
                     </section>
 
-                    <section class="summary-grid" aria-label="Resumo operacional">
+                    <section class="summary-grid" data-live-region="summary" aria-label="Resumo operacional">
                         <article class="summary-card summary-card-primary">
                             <span class="summary-label">Quartos ocupados</span>
                             <strong data-testid="occupied-rooms-count">{{ dashboard.summary.occupied_rooms }}</strong>
@@ -106,15 +77,16 @@
                         </article>
                     </section>
 
-                    <section class="summary-grid operational-summary" aria-label="Serviços em andamento">
+                    <section class="summary-grid operational-summary" data-live-region="services-summary" aria-label="Serviços em andamento">
                         <a class="summary-card" href="/reception/service-requests?category=CLEANING"><span class="summary-label">Limpeza</span><strong data-testid="cleaning-requests-count">{{ dashboard.summary.cleaning_requests }}</strong><span class="summary-caption">Solicitações ativas</span></a>
                         <a class="summary-card" href="/reception/service-requests?category=MAINTENANCE"><span class="summary-label">Manutenção</span><strong data-testid="maintenance-requests-count">{{ dashboard.summary.maintenance_requests }}</strong><span class="summary-caption">Solicitações ativas</span></a>
                         <a class="summary-card" href="/reception/service-requests?category=COMPLAINT"><span class="summary-label">Reclamações</span><strong data-testid="complaints-count">{{ dashboard.summary.complaints }}</strong><span class="summary-caption">Pendentes</span></a>
                         <a class="summary-card" href="/reception/service-requests?category=HELP"><span class="summary-label">Ajuda</span><strong data-testid="help-requests-count">{{ dashboard.summary.help_requests }}</strong><span class="summary-caption">Pendentes</span></a>
-                        <article class="summary-card"><span class="summary-label">Pedidos de comida</span><strong data-testid="active-food-orders-count">{{ dashboard.summary.active_food_orders }}</strong><span class="summary-caption">Na cozinha</span></article>
+                        <article class="summary-card" id="food-summary"><span class="summary-label">Pedidos de comida</span><strong data-testid="active-food-orders-count">{{ dashboard.summary.active_food_orders }}</strong><span class="summary-caption">Na cozinha</span></article>
                     </section>
 
-                    <div class="dashboard-grid">
+                    <div class="dashboard-toolbar"><a class="button button-primary" href="/reception/reservations/new">+ Nova reserva</a><a href="/reception/check-in">Gerenciar chegadas →</a><span class="record-count" data-live-region="request-total">Solicitações abertas e em atendimento: {{ dashboard.summary.cleaning_requests + dashboard.summary.maintenance_requests + dashboard.summary.complaints + dashboard.summary.help_requests }}</span></div>
+                    <div class="dashboard-grid" data-live-region="rooms-reservations">
                         <section class="panel rooms-panel" aria-labelledby="rooms-title">
                             <div class="panel-header">
                                 <div>
@@ -125,26 +97,7 @@
                             </div>
 
                             {% if dashboard.rooms %}
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Quarto</th>
-                                            <th scope="col">Tipo</th>
-                                            <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for room in dashboard.rooms %}
-                                        <tr data-room-number="{{ room.number }}">
-                                            <td><strong class="room-number">{{ room.number }}</strong></td>
-                                            <td>{{ room.category }}</td>
-                                            <td><span class="status-badge status-{{ room.status_style }}">{{ room.status_label }}</span></td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <div class="room-grid">{% for room in dashboard.rooms %}<article class="room-tile {{ room.status_style }}" data-room-number="{{ room.number }}"><span class="eyebrow">Quarto</span><strong>{{ room.number }}</strong><small>{{ room.category }}</small><span class="status-badge status-{{ room.status_style }}">{{ room.status_label }}</span></article>{% endfor %}</div>
                             {% else %}
                             <div class="empty-state">
                                 <strong>Nenhum quarto ativo</strong>
@@ -187,6 +140,7 @@
                             {% endif %}
                         </section>
                     </div>
+<section class="panel activity-panel" aria-labelledby="activity-title"><div class="panel-header"><div><p class="eyebrow">Atenção aos detalhes</p><h2 id="activity-title">Atividade dos quartos</h2></div><a href="/reception/service-requests">Ver solicitações →</a></div><div class="activity-list" data-live-region="activity">{% for item in recent_requests %}<article class="activity-item"><time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime('%d/%m · %H:%M') }}</time><div><strong>Quarto {{ item.room_number }}</strong><p>{{ {'CLEANING':'Solicitação de limpeza','MAINTENANCE':'Solicitação de manutenção','HELP':'Pedido de ajuda','COMPLAINT':'Reclamação registrada'}[item.category] }}</p></div><span class="status-badge">{{ {'OPEN':'Aberta','IN_PROGRESS':'Em atendimento','COMPLETED':'Concluída','CANCELLED':'Cancelada'}[item.status] }}</span></article>{% else %}<div class="empty-state"><strong>Nenhuma atividade por enquanto</strong><span>As solicitações dos quartos aparecerão aqui.</span></div>{% endfor %}</div></section>
                 </div>
             </main>
         </div>

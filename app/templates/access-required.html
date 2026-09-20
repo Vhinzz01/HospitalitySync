@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from 'components/icons.html' import icon, brand %}
+{% block title %}Acesso necessário | HospitalitySync{% endblock %}
+{% block body %}
+<main id="main" class="access-page">
+    {{ brand() }}
+    <section class="access-card">
+        <span class="module-icon">{{ icon('device' if area == 'guest' else 'people', 32) }}</span>
+        <p class="eyebrow">Seu ambiente, com segurança</p>
+        {% if area == 'guest' %}
+        <h1>Vamos conectar seu quarto.</h1>
+        <p>Este dispositivo precisa estar vinculado a um quarto. Solicite os códigos de configuração à recepção.</p>
+        <a class="button button-primary" href="/guest/setup">Vincular dispositivo {{ icon('arrow', 18) }}</a>
+        {% else %}
+        <h1>Entre para continuar.</h1>
+        <p>Acesse com uma conta autorizada da {{ 'recepção' if area == 'reception' else 'cozinha' }}.</p>
+        <a class="button button-primary" href="/{{ area }}/login">Acessar meu ambiente {{ icon('arrow', 18) }}</a>
+        {% endif %}
+        <a href="/">← Voltar ao início</a>
+    </section>
+</main>
+{% endblock %}

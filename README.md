@@ -256,12 +256,81 @@ python -m uvicorn app.main:create_app --factory --env-file .env --reload
 
 Interfaces principais:
 
+- `http://localhost:8000/` — apresentação e acesso aos ambientes
+- `http://localhost:8000/reception/login` — login visual da recepção
 - `http://localhost:8000/reception`
 - `http://localhost:8000/guest/setup`
 - `http://localhost:8000/kitchen/login`
 - documentação da API: `http://localhost:8000/docs`
 
 O login da recepção é realizado por `POST /auth/login`; o login da cozinha, por `POST /auth/kitchen/login`. As áreas operacionais continuam protegidas mesmo que alguém tente acessar diretamente as URLs.
+
+### Camada visual
+
+O frontend usa Jinja2, CSS e JavaScript nativos, sem framework ou dependência de CDN. A identidade visual está em `app/static/css/base.css`; `landing.css` cuida da apresentação e dos logins, e `product.css` compartilha os componentes operacionais com as folhas existentes. `base.html`, o template de login, os ícones SVG e a navegação da recepção são reutilizados entre telas.
+
+A recepção apresenta indicadores reais, quartos em cards e uma timeline das últimas solicitações. A cozinha organiza os pedidos em quatro colunas. O quarto oferece ações grandes para toque, formulário de solicitação e acompanhamento de pedidos. Não são criados dados de demonstração, contas ou senhas automaticamente.
+
+`base.js` centraliza feedback, atualizações parciais e conexão WebSocket com reconexão limitada. Ao receber eventos, busca novamente o HTML pela rota autenticada e substitui apenas regiões de leitura; formulários em preenchimento são preservados. Não há polling. A recepção recebe novas solicitações, a cozinha recebe novos pedidos e o quarto recebe atualizações de pedidos/serviços, conforme os eventos já disponíveis no backend. Os demais indicadores podem ser atualizados pelo botão **Atualizar dados**. O feed mostra solicitações persistidas, não um histórico completo de eventos do hotel.
+
+O backend atual não possui prioridade de solicitações nem detalhes de pedidos autorizados para a recepção. A interface não inventa esses campos nem permite acesso da recepção às operações exclusivas da cozinha. No hub público, as indicações de acesso descrevem os requisitos de cada ambiente, não simulam disponibilidade online.
+
+Os formulários de login utilizam os endpoints e cookies existentes. Erros 401/403 solicitados como HTML recebem uma página visual de acesso necessário, mantendo o mesmo status HTTP; clientes JSON conservam a resposta de API. `/docs` continua sendo a documentação técnica.
+
+As telas incluem foco visível, navegação por teclado, feedback acessível, layouts responsivos e respeito a `prefers-reduced-motion`. A validação visual final nos navegadores e dispositivos de destino continua recomendada.
+
+## Docker Compose
+
+O ambiente Docker possui dois serviços:
+
+- `app`: aplicação FastAPI executada por Uvicorn;
+- `db`: PostgreSQL 18 com volume persistente e healthcheck.
+
+O volume é montado em `/var/lib/postgresql`, caminho definido pela imagem oficial para PostgreSQL 18 e versões posteriores.
+
+Copie `.env.example` para `.env` e substitua, no mínimo, `POSTGRES_PASSWORD` e `SESSION_SECRET_KEY` por valores aleatórios. Use uma senha URL-safe para o PostgreSQL, pois o Compose a utiliza na construção da URL SQLAlchemy.
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Suba o ambiente:
+
+```bash
+docker compose up --build
+```
+
+O PostgreSQL precisa passar pelo healthcheck antes de o serviço `app` iniciar. No container da aplicação, o Compose monta automaticamente uma `DATABASE_URL` cujo hostname é `db`:
+
+```text
+postgresql+psycopg://<user>:<password>@db:5432/<database>
+```
+
+Ao iniciar, o container executa primeiro:
+
+```bash
+python -m alembic upgrade head
+```
+
+Somente após uma migration bem-sucedida o Uvicorn é iniciado em `0.0.0.0:8000`. A aplicação fica disponível em `http://localhost:8000`.
+
+Comandos úteis:
+
+```bash
+docker compose ps
+docker compose logs -f app
+docker compose exec app python -m alembic current
+docker compose down
+```
+
+O comando abaixo também remove o volume do PostgreSQL e todos os dados do banco Docker; use-o somente quando essa exclusão for intencional:
+
+```bash
+docker compose down --volumes
+```
+
+A porta do PostgreSQL não é publicada no host. A aplicação acessa o banco pela rede interna do Compose, enquanto o PostgreSQL já instalado no computador pode continuar usando sua porta local normalmente.
 
 ## Testes
 
@@ -271,14 +340,22 @@ Execute a suíte completa:
 python -m pytest -q
 ```
 
+Para os testes do cliente JavaScript, com Node.js instalado (sem dependências npm):
+
+```bash
+node --test tests/frontend.test.cjs
+```
+
 Os testes usam SQLite em memória com uma adaptação controlada dos tipos PostgreSQL. Eles não dependem do banco local, de credenciais reais, de rede ou de dados externos. As constraints específicas do PostgreSQL também são verificadas pela metadata e pela sincronização do Alembic com o banco real.
 
-Na auditoria para publicação, a suíte apresentou:
+Na implementação da camada visual, a suíte apresentou:
 
 ```text
-76 passed
-Cobertura de app: 88%
+84 testes Python passando
+5 testes JavaScript passando
 ```
+
+O inventário da entrega visual e os limites da verificação estão em [docs/frontend.md](docs/frontend.md).
 
 ## Fluxos principais
 

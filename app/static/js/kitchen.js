@@ -1,6 +1,23 @@
-document.querySelector("#kitchen-logout")?.addEventListener("click",async()=>{await fetch("/auth/logout",{method:"POST",credentials:"same-origin"});window.location.assign("/kitchen/login")});
-document.querySelector("#order-status-filter select")?.addEventListener("change",(event)=>event.currentTarget.form.submit());
-document.querySelectorAll("[data-next-status]").forEach((button)=>button.addEventListener("click",async()=>{button.disabled=true;const response=await fetch(`/kitchen/orders/${button.dataset.orderId}/status`,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:button.dataset.nextStatus})});if(response.ok)window.location.reload();else{button.disabled=false;window.alert("Não foi possível atualizar o pedido.")}}));
-document.querySelector("#menu-item-form")?.addEventListener("submit",async(event)=>{event.preventDefault();const form=event.currentTarget;const data=new FormData(form);const response=await fetch("/kitchen/menu-items",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:data.get("name"),description:data.get("description")||null,price:data.get("price"),available:true})});if(response.ok)window.location.reload();else window.alert("Não foi possível adicionar o item.")});
-document.querySelectorAll(".toggle-menu-item").forEach((button)=>button.addEventListener("click",async()=>{const response=await fetch(`/kitchen/menu-items/${button.dataset.itemId}/availability`,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({available:button.dataset.available==="true"})});if(response.ok)window.location.reload();}));
-const kitchenSocket=new WebSocket(`${location.protocol==="https:"?"wss":"ws"}://${location.host}/kitchen/ws`);kitchenSocket.addEventListener("message",(event)=>{const payload=JSON.parse(event.data);if(payload.type==="food_order.created")window.location.reload()});
+"use strict";
+document.querySelector('#kitchen-logout').addEventListener('click', async event => {
+    if (await Hospitality.mutate('/auth/logout', undefined, event.currentTarget)) location.assign('/kitchen/login');
+});
+document.addEventListener('click', async event => {
+    const statusButton = event.target.closest('[data-next-status]');
+    const menuButton = event.target.closest('.toggle-menu-item');
+    if (statusButton && await Hospitality.mutate(`/kitchen/orders/${statusButton.dataset.orderId}/status`, {status: statusButton.dataset.nextStatus}, statusButton)) {
+        Hospitality.toast('Pedido atualizado.'); await Hospitality.refresh();
+    }
+    if (menuButton && await Hospitality.mutate(`/kitchen/menu-items/${menuButton.dataset.itemId}/availability`, {available: menuButton.dataset.available === 'true'}, menuButton)) {
+        Hospitality.toast('Cardápio atualizado.'); await Hospitality.refresh();
+    }
+});
+document.querySelector('#menu-item-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    if (await Hospitality.mutate('/kitchen/menu-items', {name: data.get('name'), description: data.get('description') || null, price: data.get('price'), available: true}, form.querySelector('[type="submit"]'))) {
+        form.reset(); Hospitality.toast('Item adicionado ao cardápio.'); await Hospitality.refresh();
+    }
+});
+Hospitality.connect('/kitchen/ws', ['food_order.created']);

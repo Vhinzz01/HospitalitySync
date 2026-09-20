@@ -1,0 +1,13 @@
+{% from 'components/icons.html' import icon, brand %}
+<aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+    {{ brand() }}
+    <nav class="navigation"><p class="navigation-label">Workspace / Recepção</p>
+    {% for path, label, glyph in [('/reception','Overview','grid'),('/reception/reservations','Reservas','calendar'),('/reception/guests','Hóspedes','people'),('/reception#rooms-title','Quartos','room'),('/reception/service-requests','Serviços','service'),('/reception#food-summary','Pedidos','kitchen')] %}
+    <a class="navigation-link {% if request.url.path == path %}is-active{% endif %}" href="{{ path }}" {% if request.url.path == path %}aria-current="page"{% endif %}>{{ icon(glyph, 19) }}<span>{{ label }}</span></a>
+    {% endfor %}
+    <p class="navigation-label navigation-label-secondary">Operações</p>
+    {% for path, label, glyph in [('/reception/check-in','Check-in','arrow'),('/reception/check-out','Check-out','arrow'),('/reception/room-devices','Dispositivos','device')] %}
+    <a class="navigation-link {% if request.url.path == path %}is-active{% endif %}" href="{{ path }}">{{ icon(glyph, 19) }}<span>{{ label }}</span></a>
+    {% endfor %}</nav>
+    <div class="sidebar-footer"><span>Hospitality, in sync.<br><small>Cuidado em cada conexão.</small></span></div>
+</aside>

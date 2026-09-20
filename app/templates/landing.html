@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from 'components/icons.html' import icon, brand %}
+{% block styles %}<link rel="stylesheet" href="{{ url_for('static', path='/css/landing.css') }}">{% endblock %}
+{% block body_class %}landing-page{% endblock %}
+{% block body %}
+<header class="landing-header">{{ brand() }}<nav aria-label="Navegação principal"><a href="#connection">A plataforma</a><a href="#environments">Ambientes</a><a class="button button-outline" href="/reception/login">Acessar sistema {{ icon('arrow', 18) }}</a></nav></header>
+<main id="main">
+    <section class="hero">
+        <div class="hero-copy"><p class="eyebrow light-eyebrow"><span class="decorative-dot"></span> Intelligent Hospitality Management System</p><h1>A arte de receber.<br><span>A inteligência<br>de conectar.</span></h1><p class="hero-description">Cada detalhe da hospedagem, em sintonia. Recepção, quartos e cozinha conectados em uma experiência única.</p><div class="hero-actions"><a class="button button-cyan" href="/reception/login">Acessar sistema {{ icon('arrow', 19) }}</a><a class="text-link" href="#environments">Conheça os ambientes ↗</a></div><div class="hero-note"><span class="gold-line"></span> Mais conexão. Mais tempo para acolher.</div></div>
+        <div class="connection-art" role="img" aria-label="Ilustração dos três ambientes conectados à plataforma HospitalitySync">
+            <div class="orbit orbit-outer"></div><div class="orbit orbit-inner"></div>
+            <svg class="connection-lines" viewBox="0 0 520 500" aria-hidden="true"><path d="M260 245 260 80M260 245 80 355M260 245 440 355"/></svg>
+            <div class="sync-core"><div class="core-monogram">H<span>·</span></div><strong>HospitalitySync</strong><small>Uma operação. Em sintonia.</small></div>
+            <div class="orbit-node node-reception">{{ icon('calendar', 28) }}<div><small>01 / OPERAÇÃO</small><strong>Recepção</strong></div><span class="decorative-dot"></span></div>
+            <div class="orbit-node node-room">{{ icon('room', 28) }}<div><small>02 / EXPERIÊNCIA</small><strong>Quartos</strong></div></div>
+            <div class="orbit-node node-kitchen">{{ icon('kitchen', 28) }}<div><small>03 / SERVIÇO</small><strong>Cozinha</strong></div></div>
+            <span class="art-caption">HOSPITALIDADE EM MOVIMENTO</span>
+        </div>
+    </section>
+    <section class="connection-strip" id="connection"><p>Uma plataforma.<br><strong>Tudo sincronizado.</strong></p><div>{{ icon('calendar') }}<span>Da primeira reserva</span></div><span class="strip-line"></span><div>{{ icon('room') }}<span>A cada momento da estadia</span></div><span class="strip-line"></span><div>{{ icon('kitchen') }}<span>Até o último detalhe</span></div></section>
+    <section class="environments" id="environments"><div class="section-heading"><div><p class="eyebrow">Um hotel. Três perspectivas.</p><h2>O lugar certo para cada experiência.</h2></div><p>Escolha seu ambiente de trabalho<br>ou de hospedagem.</p></div><div class="module-grid">
+        <article class="module-card"><div class="module-top"><span class="module-icon">{{ icon('calendar', 30) }}</span><span class="module-number">01</span></div><p class="eyebrow">Controle com clareza</p><h3>Recepção</h3><p>Reservas, hóspedes e operações. Uma visão completa para cuidar de cada chegada e de cada partida.</p><span class="access-label">Acesso de funcionários</span><a href="/reception/login">Entrar na recepção {{ icon('arrow', 20) }}</a></article>
+        <article class="module-card module-guest"><div class="module-top"><span class="module-icon">{{ icon('room', 30) }}</span><span class="module-number">02</span></div><p class="eyebrow">Conforto a um toque</p><h3>Seu quarto</h3><p>Sabores, cuidado e atenção. Peça uma refeição, solicite um serviço e aproveite sua estadia.</p><span class="access-label">Requer dispositivo vinculado</span><a href="/guest">Acessar meu quarto {{ icon('arrow', 20) }}</a><a class="setup-link" href="/guest/setup">Configurar dispositivo</a></article>
+        <article class="module-card module-kitchen"><div class="module-top"><span class="module-icon">{{ icon('kitchen', 30) }}</span><span class="module-number">03</span></div><p class="eyebrow">Precisão em cada entrega</p><h3>Cozinha</h3><p>Do pedido ao prato pronto. Organize o preparo e acompanhe cada etapa do serviço de quarto.</p><span class="access-label">Acesso da equipe de cozinha</span><a href="/kitchen/login">Entrar na cozinha {{ icon('arrow', 20) }}</a></article>
+    </div></section>
+    <section class="landing-closing"><span class="eyebrow light-eyebrow">Hospitality, in sync.</span><h2>Tecnologia que aproxima.<br>Hospitalidade que permanece.</h2><a class="button button-cyan" href="/reception/login">Começar a operação {{ icon('arrow', 20) }}</a></section>
+</main><footer class="landing-footer">{{ brand() }}<span>Gestão inteligente. Experiências humanas.</span><a href="/docs">Documentação técnica ↗</a></footer>
+{% endblock %}
