@@ -1,0 +1,1 @@
+"""HospitalitySync application package."""
