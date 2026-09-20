@@ -24,6 +24,7 @@ class Settings:
     session_cookie_secure: bool = True
     session_max_age_seconds: int = 28_800
     device_cookie_max_age_seconds: int = 31_536_000
+    enable_demo_access: bool = False
 
     def __post_init__(self) -> None:
         if not self.database_url.startswith(("postgresql://", "postgresql+psycopg://")):
@@ -61,4 +62,5 @@ class Settings:
             session_cookie_secure=_read_boolean("SESSION_COOKIE_SECURE", True),
             session_max_age_seconds=session_max_age_seconds,
             device_cookie_max_age_seconds=device_cookie_max_age_seconds,
+            enable_demo_access=_read_boolean("ENABLE_DEMO_ACCESS", False),
         )

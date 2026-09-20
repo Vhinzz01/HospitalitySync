@@ -108,6 +108,27 @@ window.Hospitality = (() => {
     }
     document.addEventListener('click', event => {
         if (event.target.closest('[data-refresh]')) refresh();
+        const demoButton = event.target.closest('[data-demo-area]');
+        if (demoButton) enterDemo(demoButton);
     });
-    return {toast, mutate, refresh, connect};
+    async function enterDemo(button) {
+        if (button.disabled) return;
+        const original = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Preparando ambiente…';
+        try {
+            const response = await fetch(`/auth/demo/${button.dataset.demoArea}`, {
+                method: 'POST', credentials: 'same-origin',
+                headers: {'Accept': 'application/json'},
+            });
+            if (!response.ok) throw new Error('demo-access');
+            const payload = await response.json();
+            location.assign(payload.destination);
+        } catch {
+            button.disabled = false;
+            button.textContent = original;
+            toast('Não foi possível preparar o acesso de demonstração.');
+        }
+    }
+    return {toast, mutate, refresh, connect, enterDemo};
 })();

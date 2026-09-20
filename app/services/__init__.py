@@ -1,6 +1,7 @@
 """Application services."""
 
 from app.services.authentication import AuthenticationService
+from app.services.demo_access import DemoAccessError, DemoAccessService
 from app.services.devices import (
     DeviceAuthenticationError,
     DeviceConflictError,
@@ -50,6 +51,8 @@ from app.services.service_requests import (
 
 __all__ = [
     "AuthenticationService",
+    "DemoAccessError",
+    "DemoAccessService",
     "DeviceAuthenticationError",
     "DeviceConflictError",
     "DeviceError",

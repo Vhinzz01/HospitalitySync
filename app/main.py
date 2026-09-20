@@ -67,7 +67,10 @@ def create_app(
             return templates.TemplateResponse(
                 request=request,
                 name="access-required.html",
-                context={"area": area},
+                context={
+                    "area": area,
+                    "demo_access_enabled": application_settings.enable_demo_access,
+                },
                 status_code=error.status_code,
                 headers=error.headers,
             )
@@ -124,7 +127,11 @@ def create_app(
 
     @app.get("/", include_in_schema=False)
     def root(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse(request=request, name="landing.html", context={})
+        return templates.TemplateResponse(
+            request=request,
+            name="landing.html",
+            context={"demo_access_enabled": application_settings.enable_demo_access},
+        )
 
     app.mount("/static", StaticFiles(directory=str(STATIC_DIRECTORY)), name="static")
     app.include_router(auth_router)

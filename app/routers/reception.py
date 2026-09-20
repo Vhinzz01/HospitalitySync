@@ -18,7 +18,9 @@ router = APIRouter(prefix="/reception", tags=["reception"])
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 def reception_login_page(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
-        request=request, name="reception/login.html", context={}
+        request=request,
+        name="reception/login.html",
+        context={"demo_access_enabled": request.app.state.settings.enable_demo_access},
     )
 
 

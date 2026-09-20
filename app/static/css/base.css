@@ -45,6 +45,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--color-primary); 
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 15px; min-height: 48px; padding: 12px 23px; border: 1px solid transparent; border-radius: 9px; text-decoration: none; font-weight: 600; font-size: 14px; transition: transform .18s, background .18s; }
 .button:hover { transform: translateY(-2px); }
 .button-primary { color: var(--color-surface); background: var(--color-primary); }
+.button-demo { width: 100%; color: var(--color-night); background: var(--color-warning-soft); border-color: #d9b86c; }
 .button-cyan { color: var(--color-night); background: var(--color-accent); }
 .button-outline { border-color: var(--color-muted-dark); color: inherit; background: transparent; }
 .eyebrow { color: var(--color-primary); text-transform: uppercase; font-weight: 650; font-size: 11px; letter-spacing: .16em; }

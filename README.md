@@ -197,6 +197,7 @@ Variáveis necessárias:
 | `SESSION_COOKIE_SECURE` | Use `true` com HTTPS; somente desenvolvimento HTTP deve usar `false` |
 | `SESSION_MAX_AGE_SECONDS` | Duração da sessão dos funcionários |
 | `DEVICE_COOKIE_MAX_AGE_SECONDS` | Duração da credencial local do dispositivo do quarto |
+| `ENABLE_DEMO_ACCESS` | Habilita botões temporários de acesso e dados de demonstração; mantenha `false` em produção |
 
 Formato esperado para a conexão:
 

@@ -14,6 +14,7 @@ from app.repositories import (
     StayRepository,
     ServiceRequestRepository,
     UserRepository,
+    DemoRepository,
 )
 from app.services import (
     AuthenticationService,
@@ -25,6 +26,7 @@ from app.services import (
     DeviceService,
     StayService,
     ServiceRequestService,
+    DemoAccessService,
 )
 
 
@@ -38,6 +40,16 @@ def get_authentication_service(session: DatabaseSession) -> AuthenticationServic
 Authentication = Annotated[
     AuthenticationService,
     Depends(get_authentication_service),
+]
+
+
+def get_demo_access_service(session: DatabaseSession) -> DemoAccessService:
+    return DemoAccessService(DemoRepository(session))
+
+
+DemoAccessOperations = Annotated[
+    DemoAccessService,
+    Depends(get_demo_access_service),
 ]
 
 

@@ -16,6 +16,11 @@
         <p>Acesse com uma conta autorizada da {{ 'recepção' if area == 'reception' else 'cozinha' }}.</p>
         <a class="button button-primary" href="/{{ area }}/login">Acessar meu ambiente {{ icon('arrow', 18) }}</a>
         {% endif %}
+        {% if demo_access_enabled %}
+        <button class="button button-demo" type="button" data-demo-area="{{ area }}">
+            Testar este ambiente agora {{ icon('arrow', 18) }}
+        </button>
+        {% endif %}
         <a href="/">← Voltar ao início</a>
     </section>
 </main>

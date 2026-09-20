@@ -24,6 +24,7 @@ from app.repositories.service_request_repository import (
     ServiceRequestRepository,
 )
 from app.repositories.user_repository import UserRepository
+from app.repositories.demo_repository import DemoRepository
 
 __all__ = [
     "ReceptionDashboardRepository",
@@ -41,4 +42,5 @@ __all__ = [
     "ServiceRequestRecord",
     "ServiceRequestRepository",
     "UserRepository",
+    "DemoRepository",
 ]
