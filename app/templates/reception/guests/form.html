@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ form_title }} | HospitalitySync</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reservations.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/guests.css') }}">
+        <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+        <script src="{{ url_for('static', path='/js/guests.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+                <div class="brand"><div class="brand-mark" aria-hidden="true">H</div><div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div></div>
+                <nav class="navigation"><p class="navigation-label">Operação</p><a class="navigation-link" href="/reception"><span class="navigation-icon" aria-hidden="true">⌂</span>Dashboard</a><a class="navigation-link" href="/reception/reservations"><span class="navigation-icon" aria-hidden="true">•</span>Reservas</a><a class="navigation-link is-active" href="/reception/guests" aria-current="page"><span class="navigation-icon" aria-hidden="true">•</span>Hóspedes</a><button class="navigation-link upcoming-module" type="button" aria-disabled="true"><span class="navigation-icon" aria-hidden="true">•</span>Quartos</button><a class="navigation-link" href="/reception/check-in"><span class="navigation-icon" aria-hidden="true">•</span>Check-in</a><a class="navigation-link" href="/reception/check-out"><span class="navigation-icon" aria-hidden="true">•</span>Check-out</a><p class="navigation-label navigation-label-secondary">Serviços</p>{% for item in ['Limpeza', 'Manutenção'] %}<button class="navigation-link upcoming-module" type="button" aria-disabled="true"><span class="navigation-icon" aria-hidden="true">•</span>{{ item }}</button>{% endfor %}</nav>
+                <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
+            </aside>
+            <main class="main-content">
+                <header class="topbar"><div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button><div><p class="eyebrow">Recepção</p><h1>Hóspedes</h1></div></div><div class="user-area"><div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div><div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><button class="logout-button" id="logout-button" type="button">Sair</button></div></header>
+                <div class="dashboard-content reservation-form-content">
+                    <a class="back-link" href="/reception/guests">← Voltar para hóspedes</a>
+                    <section class="page-heading form-page-heading"><div><p class="eyebrow">Cadastro</p><h2>{{ form_title }}</h2><p>Dados utilizados pela recepção para identificar o responsável pela reserva.</p></div></section>
+                    <section class="form-card"><div class="form-error" id="guest-form-error" role="alert" hidden></div><form id="guest-form" data-guest-id="{{ guest.id if guest else '' }}"><div class="form-grid"><label class="form-field form-field-wide"><span>Nome completo</span><input type="text" name="full_name" maxlength="150" value="{{ guest.full_name if guest else '' }}" required></label><label class="form-field"><span>Documento</span><input type="text" name="document" maxlength="50" value="{{ guest.document if guest else '' }}" required></label><label class="form-field"><span>Telefone</span><input type="tel" name="phone" maxlength="30" value="{{ guest.phone if guest and guest.phone else '' }}"></label><label class="form-field form-field-wide"><span>E-mail</span><input type="email" name="email" maxlength="320" value="{{ guest.email if guest and guest.email else '' }}"></label></div><div class="form-actions"><a class="text-button" href="/reception/guests">Cancelar</a><button class="primary-button" type="submit">{{ submit_label }}</button></div></form></section>
+                </div>
+            </main>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </body>
+</html>

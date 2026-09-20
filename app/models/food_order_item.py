@@ -15,14 +15,13 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
-from app.models.mixins import TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.food_order import FoodOrder
     from app.models.menu_item import MenuItem
 
 
-class FoodOrderItem(TimestampMixin, Base):
+class FoodOrderItem(Base):
     __tablename__ = "food_order_items"
     __table_args__ = (
         CheckConstraint("quantity > 0", name="positive_quantity"),

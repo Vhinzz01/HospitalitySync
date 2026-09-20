@@ -1,0 +1,9 @@
+.guest-filter-form {
+    grid-template-columns: minmax(260px, 1.5fr) minmax(150px, 0.6fr) auto;
+}
+
+@media (max-width: 780px) {
+    .guest-filter-form {
+        grid-template-columns: 1fr;
+    }
+}

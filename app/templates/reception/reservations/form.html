@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Formulário de reserva do HospitalitySync">
+        <title>{{ form_title }} | HospitalitySync</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reservations.css') }}">
+        <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+        <script src="{{ url_for('static', path='/js/reservations.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+                <div class="brand"><div class="brand-mark" aria-hidden="true">H</div><div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div></div>
+                <nav class="navigation">
+                    <p class="navigation-label">Operação</p>
+                    <a class="navigation-link" href="/reception"><span class="navigation-icon" aria-hidden="true">⌂</span>Dashboard</a>
+                    <a class="navigation-link is-active" href="/reception/reservations" aria-current="page"><span class="navigation-icon" aria-hidden="true">•</span>Reservas</a>
+                    <a class="navigation-link" href="/reception/guests"><span class="navigation-icon" aria-hidden="true">•</span>Hóspedes</a>
+                    <a class="navigation-link" href="/reception/room-devices"><span class="navigation-icon" aria-hidden="true">•</span>Dispositivos</a>
+                    <a class="navigation-link" href="/reception/check-in"><span class="navigation-icon" aria-hidden="true">•</span>Check-in</a>
+                    <a class="navigation-link" href="/reception/check-out"><span class="navigation-icon" aria-hidden="true">•</span>Check-out</a>
+                    <p class="navigation-label navigation-label-secondary">Serviços</p>
+                    <a class="navigation-link" href="/reception/service-requests"><span class="navigation-icon" aria-hidden="true">•</span>Solicitações</a>
+                </nav>
+                <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
+            </aside>
+
+            <main class="main-content">
+                <header class="topbar">
+                    <div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button><div><p class="eyebrow">Recepção</p><h1>Reservas</h1></div></div>
+                    <div class="user-area"><div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div><div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><button class="logout-button" id="logout-button" type="button">Sair</button></div>
+                </header>
+
+                <div class="dashboard-content reservation-form-content">
+                    <a class="back-link" href="/reception/reservations">← Voltar para reservas</a>
+                    <section class="page-heading form-page-heading">
+                        <div><p class="eyebrow">Cadastro</p><h2>{{ form_title }}</h2><p>{{ form_description }}</p></div>
+                    </section>
+
+                    <section class="form-card">
+                        {% if not form_data.guests or not form_data.rooms %}
+                        <div class="form-alert" role="alert">Para criar uma reserva, é necessário possuir ao menos um hóspede e um quarto ativos.</div>
+                        {% endif %}
+                        <div class="form-error" id="reservation-form-error" role="alert" hidden></div>
+                        <form id="reservation-form" data-reservation-id="{{ form_data.reservation.id if form_data.reservation else '' }}">
+                            <div class="form-grid">
+                                <label class="form-field form-field-wide">
+                                    <span>Hóspede</span>
+                                    <select name="guest_id" required>
+                                        <option value="" disabled {% if not form_data.reservation %}selected{% endif %}>Selecione um hóspede</option>
+                                        {% for guest in form_data.guests %}
+                                        <option value="{{ guest.id }}" {% if form_data.reservation and form_data.reservation.guest_id == guest.id %}selected{% endif %}>{{ guest.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label class="form-field">
+                                    <span>Quarto</span>
+                                    <select name="room_id" id="room-select" required>
+                                        <option value="" disabled {% if not form_data.reservation %}selected{% endif %}>Selecione um quarto</option>
+                                        {% for room in form_data.rooms %}
+                                        <option value="{{ room.id }}" data-capacity="{{ room.capacity }}" {% if form_data.reservation and form_data.reservation.room_id == room.id %}selected{% endif %}>{{ room.number }} · {{ room.category }} · até {{ room.capacity }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <label class="form-field">
+                                    <span>Número de hóspedes</span>
+                                    <input type="number" name="guest_count" min="1" value="{{ form_data.reservation.guest_count if form_data.reservation else 1 }}" required>
+                                </label>
+                                <label class="form-field">
+                                    <span>Data de entrada</span>
+                                    <input type="date" name="check_in_date" value="{{ form_data.reservation.check_in_date.isoformat() if form_data.reservation else '' }}" required>
+                                </label>
+                                <label class="form-field">
+                                    <span>Data de saída</span>
+                                    <input type="date" name="check_out_date" value="{{ form_data.reservation.check_out_date.isoformat() if form_data.reservation else '' }}" required>
+                                </label>
+                            </div>
+                            <div class="form-note"><strong>Disponibilidade protegida</strong><span>O sistema verificará conflitos antes de salvar e o PostgreSQL fará uma validação final do período.</span></div>
+                            <div class="form-actions"><a class="text-button" href="/reception/reservations">Cancelar</a><button class="primary-button" type="submit" {% if not form_data.guests or not form_data.rooms %}disabled{% endif %}>{{ submit_label }}</button></div>
+                        </form>
+                    </section>
+                </div>
+            </main>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </body>
+</html>

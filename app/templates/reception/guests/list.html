@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hóspedes | HospitalitySync</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reservations.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/guests.css') }}">
+        <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+        <script src="{{ url_for('static', path='/js/guests.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+                <div class="brand"><div class="brand-mark" aria-hidden="true">H</div><div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div></div>
+                <nav class="navigation">
+                    <p class="navigation-label">Operação</p>
+                    <a class="navigation-link" href="/reception"><span class="navigation-icon" aria-hidden="true">⌂</span>Dashboard</a>
+                    <a class="navigation-link" href="/reception/reservations"><span class="navigation-icon" aria-hidden="true">•</span>Reservas</a>
+                    <a class="navigation-link is-active" href="/reception/guests" aria-current="page"><span class="navigation-icon" aria-hidden="true">•</span>Hóspedes</a>
+                    <a class="navigation-link" href="/reception/room-devices"><span class="navigation-icon" aria-hidden="true">•</span>Dispositivos</a>
+                    <a class="navigation-link" href="/reception/check-in"><span class="navigation-icon" aria-hidden="true">•</span>Check-in</a><a class="navigation-link" href="/reception/check-out"><span class="navigation-icon" aria-hidden="true">•</span>Check-out</a>
+                    <p class="navigation-label navigation-label-secondary">Serviços</p>
+                    <a class="navigation-link" href="/reception/service-requests"><span class="navigation-icon" aria-hidden="true">•</span>Solicitações</a>
+                </nav>
+                <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
+            </aside>
+            <main class="main-content">
+                <header class="topbar">
+                    <div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button><div><p class="eyebrow">Recepção</p><h1>Hóspedes</h1></div></div>
+                    <div class="user-area"><div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div><div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><button class="logout-button" id="logout-button" type="button">Sair</button></div>
+                </header>
+                <div class="dashboard-content reservations-content">
+                    <section class="page-heading"><div><p class="eyebrow">Cadastro</p><h2>Hóspedes</h2><p>Consulte e mantenha os dados utilizados nas reservas.</p></div><a class="primary-button" href="/reception/guests/new">Novo hóspede</a></section>
+                    <section class="filter-panel" aria-label="Filtros de hóspedes">
+                        <form class="filter-form guest-filter-form" method="get" action="/reception/guests">
+                            <label><span>Buscar por nome ou documento</span><input type="search" name="search" value="{{ filters.search }}" placeholder="Digite para buscar"></label>
+                            <label><span>Situação</span><select name="state"><option value="active" {% if filters.state == 'active' %}selected{% endif %}>Ativos</option><option value="inactive" {% if filters.state == 'inactive' %}selected{% endif %}>Inativos</option><option value="all" {% if filters.state == 'all' %}selected{% endif %}>Todos</option></select></label>
+                            <div class="filter-actions"><button class="secondary-button" type="submit">Aplicar filtros</button><a class="text-button" href="/reception/guests">Limpar</a></div>
+                        </form>
+                    </section>
+                    <section class="panel reservations-table-panel" aria-labelledby="guest-list-title">
+                        <div class="panel-header"><div><p class="eyebrow">Registros</p><h2 id="guest-list-title">Hóspedes encontrados</h2></div><span class="record-count">{{ guests | length }} registros</span></div>
+                        {% if guests %}
+                        <div class="table-wrapper"><table class="reservations-table"><thead><tr><th scope="col">Nome</th><th scope="col">Documento</th><th scope="col">Contato</th><th scope="col">Situação</th><th scope="col" class="actions-heading">Ações</th></tr></thead><tbody>
+                            {% for guest in guests %}<tr data-guest-id="{{ guest.id }}"><td><strong>{{ guest.full_name }}</strong></td><td>{{ guest.document }}</td><td><span>{{ guest.email or '—' }}</span><span class="table-secondary">{{ guest.phone or 'Sem telefone' }}</span></td><td><span class="status-badge status-{{ guest.status_style }}">{{ guest.status_label }}</span></td><td class="table-actions"><a class="action-link" href="/reception/guests/{{ guest.id }}/edit">Editar</a>{% if guest.active %}<button class="action-link action-danger deactivate-guest" type="button" data-guest-id="{{ guest.id }}" data-guest-name="{{ guest.full_name }}">Desativar</button>{% endif %}</td></tr>{% endfor %}
+                        </tbody></table></div>
+                        {% else %}<div class="empty-state reservation-empty-state"><strong>Nenhum hóspede encontrado</strong><span>Ajuste os filtros ou cadastre um novo hóspede.</span></div>{% endif %}
+                    </section>
+                </div>
+            </main>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </body>
+</html>

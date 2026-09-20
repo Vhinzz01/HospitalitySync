@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dispositivos dos quartos | HospitalitySync</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/devices.css') }}">
+    <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+    <script src="{{ url_for('static', path='/js/devices.js') }}" defer></script>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+        <div class="brand"><div class="brand-mark" aria-hidden="true">H</div><div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div></div>
+        <nav class="navigation">
+            <p class="navigation-label">Operação</p>
+            <a class="navigation-link" href="/reception">Dashboard</a>
+            <a class="navigation-link" href="/reception/reservations">Reservas</a>
+            <a class="navigation-link" href="/reception/guests">Hóspedes</a>
+            <a class="navigation-link is-active" href="/reception/room-devices" aria-current="page">Dispositivos</a>
+            <a class="navigation-link" href="/reception/check-in">Check-in</a>
+            <a class="navigation-link" href="/reception/check-out">Check-out</a>
+        </nav>
+        <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
+    </aside>
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-heading"><button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button><div><p class="eyebrow">Recepção</p><h1>Dispositivos dos quartos</h1></div></div>
+            <div class="user-area"><div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div><div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><button class="logout-button" id="logout-button" type="button">Sair</button></div>
+        </header>
+        <div class="device-content">
+            <section class="device-grid">
+                <div class="panel device-form-panel">
+                    <p class="eyebrow">Novo vínculo</p>
+                    <h2>Preparar dispositivo</h2>
+                    <p>Crie um código temporário e informe-o no tablet do quarto.</p>
+                    <form id="device-form">
+                        <label><span>Identificação do dispositivo</span><input name="code" required minlength="3" maxlength="50" placeholder="ROOM-101"></label>
+                        <label><span>Quarto</span><select name="room_id" required><option value="">Selecione</option>{% for room in rooms %}<option value="{{ room.id }}">Quarto {{ room.number }}</option>{% endfor %}</select></label>
+                        <p class="form-error" id="device-form-error" role="alert" hidden></p>
+                        <button class="primary-button" type="submit">Gerar código de pareamento</button>
+                    </form>
+                    <div class="pairing-result" id="pairing-result" hidden>
+                        <span>Código temporário</span><strong id="pairing-code"></strong><small>Válido por 10 minutos. Ele é exibido somente agora.</small>
+                    </div>
+                </div>
+                <section class="panel device-list-panel" aria-labelledby="device-list-title">
+                    <div class="panel-header"><div><p class="eyebrow">Inventário</p><h2 id="device-list-title">Dispositivos cadastrados</h2></div><span>{{ devices | length }} registros</span></div>
+                    {% if devices %}
+                    <div class="device-list">{% for device in devices %}
+                        <article class="device-row"><div><strong>{{ device.code }}</strong><span>Quarto {{ device.room_number }}</span></div><div class="device-state"><span class="device-badge {{ 'active' if device.active else 'inactive' }}">{{ 'Ativo' if device.active else 'Aguardando/inativo' }}</span>{% if device.active %}<button type="button" class="revoke-device" data-device-id="{{ device.id }}">Revogar</button>{% endif %}</div></article>
+                    {% endfor %}</div>
+                    {% else %}<div class="empty-state"><strong>Nenhum dispositivo cadastrado</strong><span>Prepare o primeiro dispositivo usando o formulário.</span></div>{% endif %}
+                </section>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

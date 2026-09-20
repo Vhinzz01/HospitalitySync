@@ -28,7 +28,7 @@ class ServiceRequest(TimestampMixin, Base):
     __tablename__ = "service_requests"
     __table_args__ = (
         CheckConstraint(
-            "category IN ('CLEANING', 'MAINTENANCE', 'COMPLAINT')",
+            "category IN ('CLEANING', 'MAINTENANCE', 'HELP', 'COMPLAINT')",
             name="valid_category",
         ),
         CheckConstraint(
@@ -63,11 +63,13 @@ class ServiceRequest(TimestampMixin, Base):
         BigInteger,
         ForeignKey("room_devices.id", ondelete="RESTRICT"),
         nullable=True,
+        index=True,
     )
     created_by_user_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=True,
+        index=True,
     )
     category: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(

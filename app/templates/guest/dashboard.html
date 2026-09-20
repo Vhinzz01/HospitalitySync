@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quarto {{ stay.room_number }} | HospitalitySync</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/guest.css') }}">
+    <script src="{{ url_for('static', path='/js/guest-services.js') }}" defer></script>
+</head>
+<body class="guest-dashboard-page">
+    <header class="guest-header"><div class="guest-brand"><span>H</span><strong>HospitalitySync</strong></div><div><span>Quarto</span><strong>{{ stay.room_number }}</strong></div></header>
+    <main class="guest-main">
+        {% if stay.has_active_stay %}
+        <p class="guest-eyebrow">Sua hospedagem</p>
+        <h1>Olá, {{ stay.guest_name }}</h1>
+        <p>Conte com a equipe do hotel durante sua estadia.</p>
+        <section class="stay-card"><div><span>Quarto</span><strong>{{ stay.room_number }} · {{ stay.room_category }}</strong></div><div><span>Período</span><strong>{{ stay.check_in_date.strftime('%d/%m/%Y') }} — {{ stay.check_out_date.strftime('%d/%m/%Y') }}</strong></div></section>
+        {% else %}
+        <p class="guest-eyebrow">Quarto {{ stay.room_number }}</p>
+        <h1>Bem-vindo</h1>
+        <p>Não há uma hospedagem ativa vinculada a este quarto no momento.</p>
+        {% endif %}
+        {% if stay.has_active_stay %}
+        <section class="guest-services" aria-labelledby="services-title">
+            <h2 id="services-title">Como podemos ajudar?</h2>
+            <div class="service-actions">
+                <button type="button" data-service-category="CLEANING">Solicitar limpeza</button>
+                <button type="button" data-service-category="MAINTENANCE">Solicitar manutenção</button>
+                <button type="button" data-service-category="HELP">Pedir ajuda</button>
+                <button type="button" data-service-category="COMPLAINT">Registrar reclamação</button>
+            </div>
+            <form id="service-request-form" hidden>
+                <input type="hidden" name="category">
+                <label><span id="service-form-label">Descreva a solicitação</span><textarea name="description" required minlength="3" maxlength="2000"></textarea></label>
+                <p class="guest-error" id="service-error" role="alert" hidden></p>
+                <div><button type="button" id="cancel-service-request">Cancelar</button><button type="submit">Enviar solicitação</button></div>
+            </form>
+        </section>
+        <section class="request-history"><h2>Suas solicitações</h2>{% if service_requests %}<div>{% for item in service_requests %}<article><div><strong>{{ {'CLEANING':'Limpeza','MAINTENANCE':'Manutenção','HELP':'Ajuda','COMPLAINT':'Reclamação'}[item.category] }}</strong><span>{{ item.description }}</span></div><span class="request-status status-{{ item.status | lower }}">{{ {'OPEN':'Aberta','IN_PROGRESS':'Em atendimento','COMPLETED':'Concluída','CANCELLED':'Cancelada'}[item.status] }}</span></article>{% endfor %}</div>{% else %}<p>Nenhuma solicitação nesta hospedagem.</p>{% endif %}</section>
+        {% endif %}
+        <section class="future-services" aria-label="Outros serviços"><a class="food-link" href="/guest/food"><strong>Alimentação</strong><span>Ver cardápio →</span></a></section>
+    </main>
+</body>
+</html>

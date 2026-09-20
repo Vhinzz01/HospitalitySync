@@ -1,0 +1,24 @@
+.device-content { padding: 36px clamp(24px, 4vw, 54px); }
+.device-grid { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.device-form-panel, .device-list-panel { padding: 26px; }
+.device-form-panel h2 { margin: 8px 0; }
+.device-form-panel > p:not(.eyebrow) { margin: 0 0 24px; color: var(--slate-500); line-height: 1.5; }
+.device-form-panel form { display: grid; gap: 17px; }
+.device-form-panel label { display: grid; gap: 7px; color: var(--slate-700); font-size: 12px; font-weight: 700; }
+.device-form-panel input, .device-form-panel select { width: 100%; padding: 11px 12px; border: 1px solid var(--slate-300); border-radius: 8px; background: var(--white); color: var(--slate-900); font: inherit; }
+.device-form-panel .primary-button { border: 0; }
+.form-error { margin: 0; color: var(--rose-700); font-size: 13px; }
+.pairing-result { margin-top: 22px; padding: 20px; border-radius: 12px; background: var(--teal-100); text-align: center; }
+.pairing-result span, .pairing-result small { display: block; color: var(--slate-700); }
+.pairing-result strong { display: block; margin: 8px 0; color: var(--navy-900); font-size: 28px; letter-spacing: .15em; }
+.device-list { display: grid; }
+.device-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--slate-200); }
+.device-row:last-child { border-bottom: 0; }
+.device-row strong, .device-row span { display: block; }
+.device-row > div > span { margin-top: 4px; color: var(--slate-500); font-size: 12px; }
+.device-state { display: flex; align-items: center; gap: 12px; }
+.device-badge { padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.device-badge.active { background: var(--teal-100); color: var(--teal-600); }
+.device-badge.inactive { background: var(--amber-100); color: var(--amber-700); }
+.revoke-device { border: 0; background: transparent; color: var(--rose-700); cursor: pointer; font-weight: 700; }
+@media (max-width: 900px) { .device-grid { grid-template-columns: 1fr; } }

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Configurar dispositivo | HospitalitySync</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/guest.css') }}">
+    <script src="{{ url_for('static', path='/js/guest.js') }}" defer></script>
+</head>
+<body class="guest-setup-page">
+    <main class="setup-card">
+        <div class="guest-brand"><span>H</span><strong>HospitalitySync</strong></div>
+        <p class="guest-eyebrow">Configuração segura</p>
+        <h1>Vincular este dispositivo</h1>
+        <p>Use os códigos fornecidos pela recepção. Após o vínculo, este painel ficará associado permanentemente ao quarto.</p>
+        <form id="pair-device-form">
+            <label><span>Dispositivo</span><input name="code" autocomplete="off" required placeholder="ROOM-101"></label>
+            <label><span>Código temporário</span><input name="pairing_code" autocomplete="one-time-code" required placeholder="A1B2C3D4"></label>
+            <p class="guest-error" id="pair-error" role="alert" hidden></p>
+            <button type="submit">Vincular dispositivo</button>
+        </form>
+    </main>
+</body>
+</html>

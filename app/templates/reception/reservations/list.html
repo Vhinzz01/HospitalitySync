@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Reservas do HospitalitySync">
+        <title>Reservas | HospitalitySync</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reception.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/reservations.css') }}">
+        <script src="{{ url_for('static', path='/js/reception.js') }}" defer></script>
+        <script src="{{ url_for('static', path='/js/reservations.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="app-shell">
+            <aside class="sidebar" id="sidebar" aria-label="Navegação da recepção">
+                <div class="brand">
+                    <div class="brand-mark" aria-hidden="true">H</div>
+                    <div><strong>HospitalitySync</strong><span>Gestão hoteleira</span></div>
+                </div>
+                <nav class="navigation">
+                    <p class="navigation-label">Operação</p>
+                    <a class="navigation-link" href="/reception"><span class="navigation-icon" aria-hidden="true">⌂</span>Dashboard</a>
+                    <a class="navigation-link is-active" href="/reception/reservations" aria-current="page"><span class="navigation-icon" aria-hidden="true">•</span>Reservas</a>
+                    <a class="navigation-link" href="/reception/guests"><span class="navigation-icon" aria-hidden="true">•</span>Hóspedes</a>
+                    <a class="navigation-link" href="/reception/room-devices"><span class="navigation-icon" aria-hidden="true">•</span>Dispositivos</a>
+                    <a class="navigation-link" href="/reception/check-in"><span class="navigation-icon" aria-hidden="true">•</span>Check-in</a>
+                    <a class="navigation-link" href="/reception/check-out"><span class="navigation-icon" aria-hidden="true">•</span>Check-out</a>
+                    <p class="navigation-label navigation-label-secondary">Serviços</p>
+                    <a class="navigation-link" href="/reception/service-requests"><span class="navigation-icon" aria-hidden="true">•</span>Solicitações</a>
+                </nav>
+                <div class="sidebar-footer"><span class="system-indicator" aria-hidden="true"></span>Sistema operacional</div>
+            </aside>
+
+            <main class="main-content">
+                <header class="topbar">
+                    <div class="topbar-heading">
+                        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Abrir navegação" aria-controls="sidebar" aria-expanded="false">☰</button>
+                        <div><p class="eyebrow">Recepção</p><h1>Reservas</h1></div>
+                    </div>
+                    <div class="user-area">
+                        <div class="user-avatar" aria-hidden="true">{{ user.name[0] | upper }}</div>
+                        <div class="user-details"><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div>
+                        <button class="logout-button" id="logout-button" type="button">Sair</button>
+                    </div>
+                </header>
+
+                <div class="dashboard-content reservations-content">
+                    <section class="page-heading">
+                        <div>
+                            <p class="eyebrow">Gestão de hospedagens</p>
+                            <h2>Reservas</h2>
+                            <p>Consulte períodos, acompanhe situações e organize novas hospedagens.</p>
+                        </div>
+                        <a class="primary-button" href="/reception/reservations/new">Nova reserva</a>
+                    </section>
+
+                    <section class="filter-panel" aria-label="Filtros de reservas">
+                        <form class="filter-form" method="get" action="/reception/reservations">
+                            <label>
+                                <span>Status</span>
+                                <select name="status">
+                                    <option value="">Todos</option>
+                                    <option value="CONFIRMED" {% if filters.status == 'CONFIRMED' %}selected{% endif %}>Confirmada</option>
+                                    <option value="CHECKED_IN" {% if filters.status == 'CHECKED_IN' %}selected{% endif %}>Check-in realizado</option>
+                                    <option value="CHECKED_OUT" {% if filters.status == 'CHECKED_OUT' %}selected{% endif %}>Finalizada</option>
+                                    <option value="CANCELLED" {% if filters.status == 'CANCELLED' %}selected{% endif %}>Cancelada</option>
+                                </select>
+                            </label>
+                            <label><span>Período inicial</span><input type="date" name="period_start" value="{{ filters.period_start }}"></label>
+                            <label><span>Período final</span><input type="date" name="period_end" value="{{ filters.period_end }}"></label>
+                            <div class="filter-actions">
+                                <button class="secondary-button" type="submit">Aplicar filtros</button>
+                                <a class="text-button" href="/reception/reservations">Limpar</a>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="panel reservations-table-panel" aria-labelledby="reservation-list-title">
+                        <div class="panel-header">
+                            <div><p class="eyebrow">Registros</p><h2 id="reservation-list-title">Reservas encontradas</h2></div>
+                            <span class="record-count">{{ reservations | length }} registros</span>
+                        </div>
+                        {% if reservations %}
+                        <div class="table-wrapper">
+                            <table class="reservations-table">
+                                <thead><tr><th scope="col">Hóspede</th><th scope="col">Quarto</th><th scope="col">Entrada</th><th scope="col">Saída</th><th scope="col">Status</th><th scope="col" class="actions-heading">Ações</th></tr></thead>
+                                <tbody>
+                                    {% for reservation in reservations %}
+                                    <tr data-reservation-id="{{ reservation.id }}">
+                                        <td><strong>{{ reservation.guest_name }}</strong><span class="table-secondary">{{ reservation.guest_count }} hóspede{% if reservation.guest_count != 1 %}s{% endif %}</span></td>
+                                        <td><strong class="room-number">{{ reservation.room_number }}</strong></td>
+                                        <td>{{ reservation.check_in_date.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ reservation.check_out_date.strftime('%d/%m/%Y') }}</td>
+                                        <td><span class="status-badge status-{{ reservation.status_style }}">{{ reservation.status_label }}</span></td>
+                                        <td class="table-actions">
+                                            {% if reservation.status == 'CONFIRMED' %}
+                                            <a class="action-link" href="/reception/reservations/{{ reservation.id }}/edit">Editar</a>
+                                            <button class="action-link action-danger cancel-reservation" type="button" data-reservation-id="{{ reservation.id }}" data-guest-name="{{ reservation.guest_name }}">Cancelar</button>
+                                            {% else %}
+                                            <span class="unavailable-action">Sem ações</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-state reservation-empty-state"><strong>Nenhuma reserva encontrada</strong><span>Ajuste os filtros ou registre uma nova reserva.</span></div>
+                        {% endif %}
+                    </section>
+                </div>
+            </main>
+        </div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </body>
+</html>
