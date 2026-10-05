@@ -18,6 +18,14 @@ O MVP cobre o fluxo operacional essencial de um hotel:
 
 O sistema não contém dados demonstrativos automáticos. Tudo o que aparece nas interfaces é obtido do banco de dados.
 
+## Como executar
+
+1. Clone o repositório.
+2. Crie o ambiente virtual.
+3. Instale as dependências.
+4. Configure as variáveis de ambiente.
+5. Execute a aplicação.
+
 ## Tecnologias
 
 - Python 3.11+
@@ -417,6 +425,17 @@ Em desenvolvimento HTTP local, defina `SESSION_COOKIE_SECURE=false`. Em produç�
 - restrinja o usuário do banco e o acesso de rede ao PostgreSQL;
 - adicione observabilidade, backups e rotação de secrets conforme o ambiente;
 - use apenas um worker enquanto o hub WebSocket for mantido em memória.
+
+## Qualidade
+
+O projeto possui testes automatizados para as principais regras de negócio, APIs e componentes da interface.
+
+A suíte atual inclui:
+
+- 84 testes Python;
+- 5 testes JavaScript;
+- verificação de sincronização entre Models e migrations;
+- testes sem dependência de credenciais reais ou dados externos.
 
 ## Estado do projeto
 
